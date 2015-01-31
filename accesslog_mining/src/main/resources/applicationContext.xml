@@ -1,0 +1,34 @@
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.ml.v2.integ" />
+
+	<!-- Configuração do contexto do Apache Camel e exposição como JMX. -->
+	<camel:camelContext id="camel">
+		<camel:package>com.miningpro.run</camel:package>
+		<camel:jmxAgent id="agent" loadStatisticsEnabled="true"
+			statisticsLevel="All" createConnector="false" />
+	</camel:camelContext>
+
+    <bean id="slotKeyStrategy" class="com.mininpro.accesslog.repo.MinuteBasedGenerationStrategy"/>
+
+    <bean id="httpEventsRepository" class="com.mininpro.accesslog.repo.HttpEventsRepository">
+        <constructor-arg index="0"  ref="slotKeyStrategy"/>
+    </bean>
+
+    <bean id="httpEventsModel" class="com.miningpro.accesslog.analysis.HttpEventsModel">
+        <constructor-arg index="0" ref="httpEventsRepository"/>
+        <constructor-arg index="1" value="30"/>
+        <constructor-arg index="2" value="15"/>
+        <constructor-arg index="3" value="5"/>
+    </bean>
+
+
+
+</beans>
