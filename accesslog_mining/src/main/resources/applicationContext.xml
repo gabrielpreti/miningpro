@@ -22,7 +22,7 @@
         <constructor-arg index="0"  ref="slotKeyStrategy"/>
     </bean>
 
-    <bean id="httpEventsModel" class="com.miningpro.accesslog.analysis.HttpEventsModel">
+    <bean id="httpEventsAnalysis" class="com.miningpro.accesslog.analysis.HttpEventsAnalysis">
         <constructor-arg index="0" ref="httpEventsRepository"/>
         <constructor-arg index="1" value="30"/>
         <constructor-arg index="2" value="15"/>
