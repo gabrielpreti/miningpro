@@ -1,15 +1,15 @@
 package com.miningpro.analysis.timeseries;
 
-import com.miningpro.core.event.Measurable;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.miningpro.core.event.Measurable;
 
 /**
  * Created by gsantiago on 2/1/15.
  */
-public class IndividualAnalysisResult {
-    protected IndividualAnalysisStatus status;
+public class TSUnitResult {
+    protected TSUnitStatus status;
 
     /**
      * O que está sendo analisado
@@ -26,11 +26,11 @@ public class IndividualAnalysisResult {
      */
     protected Map<String, Object> details;
 
-    public IndividualAnalysisResult() {
+    public TSUnitResult() {
 
     }
 
-    public IndividualAnalysisResult(String resultId, Measurable measurableThing, IndividualAnalysisStatus status) {
+    public TSUnitResult(String resultId, Measurable measurableThing, TSUnitStatus status) {
         this.resultId = resultId;
         this.measurableThing = measurableThing;
         this.status = status;

@@ -2,11 +2,9 @@ package com.miningpro.accesslog.analysis;
 
 import com.miningpro.accesslog.event.HttpEvent;
 import com.miningpro.accesslog.event.UrlReturnCodeMeasurable;
-import com.miningpro.analysis.timeseries.BatchSlottedAnalysis;
-import com.miningpro.analysis.timeseries.IndividualAnalysisStatus;
-import com.miningpro.core.event.Event;
+import com.miningpro.analysis.batch.timeseries.TSBatchSlottedAnalysis;
+import com.miningpro.analysis.timeseries.TSUnitStatus;
 import com.miningpro.core.event.Measurable;
-import com.miningpro.repository.slot.MeasurableMetricsSlot;
 import com.mininpro.accesslog.repo.HttpEventSlot;
 import com.mininpro.accesslog.repo.HttpEventsRepository;
 import com.ml.miningpro.tools.Stats;
@@ -22,15 +20,15 @@ import java.util.Set;
 /**
  * Created by gsantiago on 2/1/15.
  */
-public class HttpEventsAnalysis extends BatchSlottedAnalysis<HttpEvent, Integer, HttpEventSlot> {
-    private static final Logger log = LoggerFactory.getLogger(HttpEventsAnalysis.class);
+public class TSHttpEventsAnalysis extends TSBatchSlottedAnalysis<HttpEvent, Integer, HttpEventSlot> {
+    private static final Logger log = LoggerFactory.getLogger(TSHttpEventsAnalysis.class);
 
     private int trainingSize, historySize, delay;
     private double higherScore;
 
     private final double THRESHOLD_REL_SD_MEAN = 0.2d;
 
-    public HttpEventsAnalysis(HttpEventsRepository repository, int trainingSize, int historySize, int delay) {
+    public TSHttpEventsAnalysis(HttpEventsRepository repository, int trainingSize, int historySize, int delay) {
         super();
         super.repository = repository;
         this.trainingSize = trainingSize;
@@ -60,7 +58,8 @@ public class HttpEventsAnalysis extends BatchSlottedAnalysis<HttpEvent, Integer,
     }
 
     @Override
-    protected void analyzeSlot(Measurable m, HttpEventSlot currentSlot, List<HttpEventSlot> slotsHistory) {
+    protected TSHttpSlotResult analyzeSlot(Measurable m, HttpEventSlot currentSlot,
+            List<HttpEventSlot> slotsHistory) {
         double[] delayMetrics = getCurrentDelayMetrics(m, slotsHistory);
         double[] historyMetrics = getCurrentHistoryMetrics(m, slotsHistory);
 
@@ -71,10 +70,10 @@ public class HttpEventsAnalysis extends BatchSlottedAnalysis<HttpEvent, Integer,
         // consideramos normal
         if (Stats.isEqual(historicalMean, 0d, 0.001d) || Stats.isEqual(historicalSd, 0d, 0.001d)) {
             log.debug("\tMean or sd equal to 0. Ignoring event.");
-            IndividualHttpResult result = new IndividualHttpResult(currentSlot.getKey(), m,
-                    IndividualAnalysisStatus.NORMAL, historicalMean, historicalSd, 0, 0, 0);
-            log.info(String.format("\tSlot %s for metric %s is %s", currentSlot.getKey(), m, result));
-            return;
+            TSHttpSlotResult result = new TSHttpSlotResult(currentSlot.getKey(), m,
+                    TSUnitStatus.NORMAL, historicalMean, historicalSd, 0, 0, 0);
+            log.debug(String.format("\tSlot %s for metric %s is %s", currentSlot.getKey(), m, result));
+            return result;
         }
 
         double currentMean = Stats.mean(delayMetrics);
@@ -97,26 +96,27 @@ public class HttpEventsAnalysis extends BatchSlottedAnalysis<HttpEvent, Integer,
         boolean isDifferenceGreatherThanHistoricalScore = scoreHistoricalSd > higherScore;
 
         if (slotsHistory.size() < (trainingSize + historySize + delay)) {
-            IndividualHttpResult result = new IndividualHttpResult(currentSlot.getKey(), m,
-                    IndividualAnalysisStatus.TRAINING, historicalMean, historicalSd, currentMean, currentSd,
+            TSHttpSlotResult result = new TSHttpSlotResult(currentSlot.getKey(), m,
+                    TSUnitStatus.TRAINING, historicalMean, historicalSd, currentMean, currentSd,
                     scoreHistoricalSd);
-            log.info(String.format("\tSlot %s for metric %s is %s", currentSlot.getKey(), m, result));
+            log.debug(String.format("\tSlot %s for metric %s is %s", currentSlot.getKey(), m, result));
             higherScore = Stats.max(higherScore, scoreHistoricalSd);
-            return;
+            return result;
         }
 
-        IndividualHttpResult result;
+        TSHttpSlotResult result;
         if (isHistoricalVariationSmallEnough && isDifferenceGreatherThanHistoricalScore) {
             currentSlot.markAlarming(m);
-            result = new IndividualHttpResult(currentSlot.getKey(), m, IndividualAnalysisStatus.ALARMING,
+            result = new TSHttpSlotResult(currentSlot.getKey(), m, TSUnitStatus.ALARMING,
                     historicalMean, historicalSd, currentMean, currentSd, scoreHistoricalSd);
-            log.info(String.format("\tSlot %s for metric %s is %s", currentSlot.getKey(), m, result));
+            log.debug(String.format("\tSlot %s for metric %s is %s", currentSlot.getKey(), m, result));
         } else {
             higherScore = Stats.max(higherScore, scoreHistoricalSd);
-            result = new IndividualHttpResult(currentSlot.getKey(), m, IndividualAnalysisStatus.NORMAL, historicalMean,
+            result = new TSHttpSlotResult(currentSlot.getKey(), m, TSUnitStatus.NORMAL, historicalMean,
                     historicalSd, currentMean, currentSd, scoreHistoricalSd);
-            log.info(String.format("\tSlot %s for metric %s is %s", currentSlot.getKey(), m, result));
+            log.debug(String.format("\tSlot %s for metric %s is %s", currentSlot.getKey(), m, result));
         }
+        return result;
     }
 
     private double[] getCurrentDelayMetrics(Measurable eventMeasurable, List<HttpEventSlot> slotsHistory) {
