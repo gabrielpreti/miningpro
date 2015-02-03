@@ -4,6 +4,9 @@ import com.miningpro.analysis.timeseries.TSUnitResult;
 import com.miningpro.analysis.timeseries.TSUnitStatus;
 import com.miningpro.core.event.Measurable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Created by gsantiago on 2/1/15.
  */

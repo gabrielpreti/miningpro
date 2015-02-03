@@ -25,4 +25,8 @@ public class TSMeasurableResult {
     public void addUnitResult(TSUnitResult r) {
         unitResults.add(r);
     }
+
+    public List<TSUnitResult> getUnitResults() {
+        return unitResults;
+    }
 }

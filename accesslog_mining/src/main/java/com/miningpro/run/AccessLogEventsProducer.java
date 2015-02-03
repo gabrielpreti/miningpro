@@ -28,7 +28,8 @@ public class AccessLogEventsProducer extends RouteBuilder {
 
         from("file:/tmp/analysis?delete=true&preMove=.run").//
                 autoStartup(true).//
-                beanRef("httpEventsAnalysis", "runBatchAnalysis");
+                beanRef("httpEventsAnalysis", "runBatchAnalysis").//
+                beanRef("report", "generateReport").log("Done");
     }
 
 }

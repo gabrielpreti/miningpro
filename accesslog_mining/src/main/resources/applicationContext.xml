@@ -29,6 +29,14 @@
         <constructor-arg index="3" value="5"/>
     </bean>
 
+    <bean id="csvReportStrategy" class="com.miningpro.reporting.CsvReportStrategy">
+        <constructor-arg index="0" value=";" />
+        <constructor-arg index="1" value="/tmp/report.csv"/>
+    </bean>
+
+    <bean id="report" class="com.miningpro.reporting.Report">
+        <constructor-arg index="0" ref="csvReportStrategy"/>
+    </bean>
 
 
 </beans>

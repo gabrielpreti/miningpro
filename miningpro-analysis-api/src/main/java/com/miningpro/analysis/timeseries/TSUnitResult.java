@@ -1,14 +1,16 @@
 package com.miningpro.analysis.timeseries;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.miningpro.core.event.Measurable;
+import com.miningpro.reporting.Reportable;
 
 /**
  * Created by gsantiago on 2/1/15.
  */
-public class TSUnitResult {
+public class TSUnitResult implements Reportable {
     protected TSUnitStatus status;
 
     /**
@@ -49,5 +51,19 @@ public class TSUnitResult {
 
         return String.format("measurableThing=[%s], resultId=[%s], status=[%s], details=[%s]",
                 String.valueOf(measurableThing), resultId, status, detailsStr);
+    }
+
+    @Override
+    public Map<String, String> report() {
+        Map<String, String> report = new LinkedHashMap<String, String>();// LinkedHashMap para manter ordem de inserção.
+
+        report.put("measurableThing", measurableThing.toString());
+        report.put("resultId", resultId);
+        report.put("status", status.toString());
+        for (String key : details.keySet()) {
+            report.put(key, String.valueOf(details.get(key)));
+        }
+
+        return report;
     }
 }
