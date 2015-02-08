@@ -1,6 +1,6 @@
 package com.miningpro.accesslog.event;
 
-import com.miningpro.core.event.Measurable;
+import com.miningpro.core.event.AnalysisUnit;
 import com.miningpro.core.event.TimedEvent;
 
 import java.util.Date;
@@ -42,12 +42,12 @@ public class HttpEvent implements TimedEvent {
     }
 
     @Override
-    public Measurable getMeasurable() {
-        return new UrlReturnCodeMeasurable(getUrl(), getReturnCode());
+    public AnalysisUnit getAnalysisUnit() {
+        return new UrlReturnCodeAnalysisUnit(getUrl(), getReturnCode());
     }
 
     @Override
     public String toString() {
-        return String.format("%s\t%s", getTime(), getMeasurable());
+        return String.format("%s\t%s", getTime(), getAnalysisUnit());
     }
 }

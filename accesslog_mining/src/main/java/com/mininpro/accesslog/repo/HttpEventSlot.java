@@ -1,8 +1,8 @@
 package com.mininpro.accesslog.repo;
 
 import com.miningpro.accesslog.event.HttpEvent;
-import com.miningpro.core.event.Measurable;
-import com.miningpro.repository.slot.AbstractMeasurableAlarmableSlot;
+import com.miningpro.core.event.AnalysisUnit;
+import com.miningpro.repository.slot.AbstractAlarmableByAnalysisUnitSlot;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +15,7 @@ import java.util.Collections;
  * @author gsantiago
  *
  */
-public class HttpEventSlot extends AbstractMeasurableAlarmableSlot<Integer, HttpEvent> {
+public class HttpEventSlot extends AbstractAlarmableByAnalysisUnitSlot<Integer, HttpEvent> {
 
     private String slotKey;
 
@@ -26,7 +26,7 @@ public class HttpEventSlot extends AbstractMeasurableAlarmableSlot<Integer, Http
 
     @Override
     protected void updateMetric(HttpEvent e) {
-        Measurable m = e.getMeasurable();
+        AnalysisUnit m = e.getAnalysisUnit();
         if (metrics.containsKey(m)) {
             metrics.put(m, metrics.get(m) + 1);
         } else {

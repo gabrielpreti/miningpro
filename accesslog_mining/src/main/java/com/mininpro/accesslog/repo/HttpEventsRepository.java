@@ -1,7 +1,7 @@
 package com.mininpro.accesslog.repo;
 
 import com.miningpro.accesslog.event.HttpEvent;
-import com.miningpro.core.event.Measurable;
+import com.miningpro.core.event.AnalysisUnit;
 import com.miningpro.repository.AbstractSlottedRepository;
 import com.miningpro.repository.SlotKeyGenerationStrategy;
 import org.slf4j.Logger;
@@ -64,8 +64,8 @@ public class HttpEventsRepository extends AbstractSlottedRepository<HttpEvent, H
         for (String slotKey : slots.keySet()) {
             PrintWriter writer = new PrintWriter(new File(outputDir, "slot_" + slotKey));
             HttpEventSlot slot = slots.get(slotKey);
-            for (Measurable measurablePieces : slot.getAllMeasurables()) {
-                writer.println(String.format("%s\t%d", measurablePieces, slot.getMetric(measurablePieces)));
+            for (AnalysisUnit analysisUnitPieces : slot.getAllAnalysisUnits()) {
+                writer.println(String.format("%s\t%d", analysisUnitPieces, slot.getMetric(analysisUnitPieces)));
             }
             writer.flush();
             writer.close();

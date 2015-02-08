@@ -1,10 +1,10 @@
 package com.miningpro.accesslog.analysis;
 
 import com.miningpro.accesslog.event.HttpEvent;
-import com.miningpro.accesslog.event.UrlReturnCodeMeasurable;
+import com.miningpro.accesslog.event.UrlReturnCodeAnalysisUnit;
 import com.miningpro.analysis.batch.timeseries.TSBatchSlottedAnalysis;
 import com.miningpro.analysis.timeseries.TSUnitStatus;
-import com.miningpro.core.event.Measurable;
+import com.miningpro.core.event.AnalysisUnit;
 import com.mininpro.accesslog.repo.HttpEventSlot;
 import com.mininpro.accesslog.repo.HttpEventsRepository;
 import com.ml.miningpro.tools.Stats;
@@ -38,27 +38,27 @@ public class TSHttpEventsAnalysis extends TSBatchSlottedAnalysis<HttpEvent, Inte
     }
 
     @Override
-    protected Set<Measurable> identifyMeasurables() {
-        Set<Measurable> uniqueMeasurables = new HashSet<Measurable>();
+    protected Set<AnalysisUnit> identifyAnalysisUnits() {
+        Set<AnalysisUnit> uniqueAnalysisUnits = new HashSet<AnalysisUnit>();
         Collection<HttpEvent> events = repository.getEvents();
         for (HttpEvent event : events) {
-            uniqueMeasurables.add(event.getMeasurable());
+            uniqueAnalysisUnits.add(event.getAnalysisUnit());
         }
 
         // TEMPORÁRIO
-        uniqueMeasurables = new HashSet<Measurable>();
-        uniqueMeasurables.add(new UrlReturnCodeMeasurable("pagseguro.uol.com.br/index.jhtml", "200"));
+        uniqueAnalysisUnits = new HashSet<AnalysisUnit>();
+        uniqueAnalysisUnits.add(new UrlReturnCodeAnalysisUnit("pagseguro.uol.com.br/index.jhtml", "200"));
 
-        return uniqueMeasurables;
+        return uniqueAnalysisUnits;
     }
 
     @Override
-    protected boolean isAnalyzable(Measurable m, HttpEventSlot currentSlot, List<HttpEventSlot> slotsHistory) {
+    protected boolean isAnalyzable(AnalysisUnit m, HttpEventSlot currentSlot, List<HttpEventSlot> slotsHistory) {
         return slotsHistory.size() >= historySize + delay;
     }
 
     @Override
-    protected TSHttpSlotResult analyzeSlot(Measurable m, HttpEventSlot currentSlot,
+    protected TSHttpSlotResult analyzeSlot(AnalysisUnit m, HttpEventSlot currentSlot,
             List<HttpEventSlot> slotsHistory) {
         double[] delayMetrics = getCurrentDelayMetrics(m, slotsHistory);
         double[] historyMetrics = getCurrentHistoryMetrics(m, slotsHistory);
@@ -119,18 +119,18 @@ public class TSHttpEventsAnalysis extends TSBatchSlottedAnalysis<HttpEvent, Inte
         return result;
     }
 
-    private double[] getCurrentDelayMetrics(Measurable eventMeasurable, List<HttpEventSlot> slotsHistory) {
+    private double[] getCurrentDelayMetrics(AnalysisUnit eventAnalysisUnit, List<HttpEventSlot> slotsHistory) {
         double[] metrics = new double[delay];
 
         ListIterator<HttpEventSlot> backwardIterator = slotsHistory.listIterator(slotsHistory.size());
         for (int i = 0; i < delay; i++) {
-            metrics[i] = backwardIterator.previous().getMetric(eventMeasurable);
+            metrics[i] = backwardIterator.previous().getMetric(eventAnalysisUnit);
         }
 
         return metrics;
     }
 
-    private double[] getCurrentHistoryMetrics(Measurable eventMeasurable, List<HttpEventSlot> slotsHistory) {
+    private double[] getCurrentHistoryMetrics(AnalysisUnit eventAnalysisUnit, List<HttpEventSlot> slotsHistory) {
         double[] metrics = new double[historySize];
 
         ListIterator<HttpEventSlot> backwardIterator = slotsHistory.listIterator(slotsHistory.size());
@@ -141,8 +141,8 @@ public class TSHttpEventsAnalysis extends TSBatchSlottedAnalysis<HttpEvent, Inte
         int addedEvents = 0;
         while (addedEvents < historySize) {
             HttpEventSlot previousSlot = backwardIterator.previous();
-            if (!previousSlot.isAlarming(eventMeasurable)) {
-                metrics[addedEvents] = previousSlot.getMetric(eventMeasurable);
+            if (!previousSlot.isAlarming(eventAnalysisUnit)) {
+                metrics[addedEvents] = previousSlot.getMetric(eventAnalysisUnit);
                 addedEvents++;
             }
         }

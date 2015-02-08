@@ -8,5 +8,5 @@ package com.miningpro.core.event;
  */
 public interface Event {
 
-    Measurable getMeasurable();
+    AnalysisUnit getAnalysisUnit();
 }

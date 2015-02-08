@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.miningpro.core.event.Measurable;
+import com.miningpro.core.event.AnalysisUnit;
 import com.miningpro.reporting.Reportable;
 
 /**
@@ -16,7 +16,7 @@ public class TSUnitResult implements Reportable {
     /**
      * O que está sendo analisado
      */
-    protected Measurable measurableThing;
+    protected AnalysisUnit analysisUnit;
 
     /**
      * Identificação da unidade sendo analisda. Ex: id do slot
@@ -32,9 +32,9 @@ public class TSUnitResult implements Reportable {
 
     }
 
-    public TSUnitResult(String resultId, Measurable measurableThing, TSUnitStatus status) {
+    public TSUnitResult(String resultId, AnalysisUnit analysisUnit, TSUnitStatus status) {
         this.resultId = resultId;
-        this.measurableThing = measurableThing;
+        this.analysisUnit = analysisUnit;
         this.status = status;
         this.details = new HashMap<String, Object>();
     }
@@ -49,15 +49,15 @@ public class TSUnitResult implements Reportable {
             detailsStr.deleteCharAt(detailsStr.lastIndexOf(","));
         }
 
-        return String.format("measurableThing=[%s], resultId=[%s], status=[%s], details=[%s]",
-                String.valueOf(measurableThing), resultId, status, detailsStr);
+        return String.format("analysisUnit=[%s], resultId=[%s], status=[%s], details=[%s]",
+                String.valueOf(analysisUnit), resultId, status, detailsStr);
     }
 
     @Override
     public Map<String, String> report() {
         Map<String, String> report = new LinkedHashMap<String, String>();// LinkedHashMap para manter ordem de inserção.
 
-        report.put("measurableThing", measurableThing.toString());
+        report.put("analysisUnit", analysisUnit.toString());
         report.put("resultId", resultId);
         report.put("status", status.toString());
         for (String key : details.keySet()) {
