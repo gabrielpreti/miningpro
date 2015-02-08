@@ -8,7 +8,7 @@
 
 		<layout class="org.apache.log4j.PatternLayout">
 <!-- 			<param name="ConversionPattern" value="[%d] [%t] %-5p %C.%M(%F:%L) - %m%n" /> -->
-				<param name="ConversionPattern" value="[%t] %-5p %C.%M  %m%n" />
+				<param name="ConversionPattern" value="[%t] %-5p %C  %m%n" />
 		</layout>
 	</appender>
 	
@@ -16,9 +16,9 @@
       <param name="File" value="/tmp/generic_ml.log"/>
       <param name="Append" value="true"/>
       <param name="DatePattern" value="'.'yyyy-MM-dd-HH"/>
-      <param name="Threshold" value="DEBUG" />
+      <param name="Threshold" value="INFO" />
       <layout class="org.apache.log4j.PatternLayout">
-      	<param name="ConversionPattern" value="%-5p %C.%M  %m%n" />
+      	<param name="ConversionPattern" value="%-5p %C  %m%n" />
       </layout>
    </appender>
 

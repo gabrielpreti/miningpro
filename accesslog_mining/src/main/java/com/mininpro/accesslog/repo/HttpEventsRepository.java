@@ -4,6 +4,8 @@ import com.miningpro.accesslog.event.HttpEvent;
 import com.miningpro.core.event.Measurable;
 import com.miningpro.repository.AbstractSlottedRepository;
 import com.miningpro.repository.SlotKeyGenerationStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.io.PrintWriter;
  * Created by gsantiago on 1/17/15.
  */
 public class HttpEventsRepository extends AbstractSlottedRepository<HttpEvent, HttpEventSlot> {
+    private static final Logger log = LoggerFactory.getLogger(HttpEventsRepository.class);
+
     private SlotKeyGenerationStrategy slotKeyGenerationStrategy;
 
     public HttpEventsRepository(SlotKeyGenerationStrategy slotKeyGenerationStrategy) {
@@ -24,10 +28,21 @@ public class HttpEventsRepository extends AbstractSlottedRepository<HttpEvent, H
         return new HttpEventSlot(slotKey, firstEvent);
     }
 
+    @Override
+    public void addEvent(HttpEvent event) {
+        if (event == null) {
+            log.warn("Event is null");
+            return;
+        }
+
+        super.addEvent(event);
+    }
+
     public void printSlotEvents() throws IOException {
         File outputDir = new File("/tmp/slots/events/");
         if (outputDir.exists())
             outputDir.delete();
+        outputDir.mkdir();
 
         for (String slotKey : slots.keySet()) {
             PrintWriter writer = new PrintWriter(new File(outputDir, "slot_" + slotKey));
